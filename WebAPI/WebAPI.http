@@ -1,6 +1,25 @@
-@WebAPI_HostAddress = http://localhost:5264
+@WebAPI_HostAddress = https://localhost:7085/api
 
-GET {{WebAPI_HostAddress}}/weatherforecast/
+POST {{WebAPI_HostAddress}}/Auth/Register
+Content-Type: application/json
 Accept: application/json
 
+{
+  "Username": "Pratima",
+  "Email": "pratimpa@in.ibm.com",
+  "PasswordHash": "Pa$$w0rd",
+  "FullName": "Pratima Patil",
+  "UserRoles": ["User"]
+}
+
 ###
+POST {{WebAPI_HostAddress}}/Auth/Login
+Content-Type: application/json
+Accept: application/json
+
+{
+  "Email": "pratimpa@in.ibm.com",
+  "PasswordHash": "Pa$$w0rd"
+}
+
+
