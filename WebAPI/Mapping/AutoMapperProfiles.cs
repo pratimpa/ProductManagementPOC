@@ -9,6 +9,7 @@ namespace WebAPI.Mapping
         public AutoMapperProfiles()
         {
             CreateMap<RegisterUserDto, User>().ReverseMap();
+            CreateMap<ProductDto, Product>().ReverseMap();
         }
     }
 }

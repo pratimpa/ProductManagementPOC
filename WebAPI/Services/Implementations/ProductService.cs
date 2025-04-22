@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using WebAPI.DTOs;
 using WebAPI.Models;
-using WebAPI.Repositories.Interfaces;
+using WebAPI.Repositories;
 using WebAPI.Services.Abstractions;
 
 namespace WebAPI.Services.Implementations
@@ -15,9 +15,9 @@ namespace WebAPI.Services.Implementations
             this._productRepository = productRepository;
             this._mapper = mapper;
         }
-        public async Task<Product> AddAsync(ProductDto product)
+        public async Task<Product> AddAsync(ProductDto productDto)
         {
-            var entity = _mapper.Map<Product>(product);
+            var entity = _mapper.Map<Product>(productDto);
               _productRepository.Add(entity);
             await  _productRepository.SaveChangesAsync();
             return entity;

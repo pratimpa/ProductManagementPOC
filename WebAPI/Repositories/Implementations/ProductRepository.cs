@@ -5,7 +5,7 @@ using WebAPI.Models;
 
 namespace WebAPI.Repositories.Implementations
 {
-    public class ProductRepository
+    public class ProductRepository:IProductRepository
     {
         ProductManagerDbContext _db; 
         public ProductRepository(ProductManagerDbContext db)
@@ -32,7 +32,7 @@ namespace WebAPI.Repositories.Implementations
             return await _db.Products.FindAsync(Id);
         }
 
-        public async Task<List<Product>> GetAll()
+        public async Task<List<Product>> GetAllAsync()
         {
             return await _db.Products.ToListAsync();
         }

@@ -21,17 +21,38 @@ namespace WebAPI.Repositories.Implementations
             return _db.Users.Include(u => u.Roles).FirstOrDefault(x => x.Email == email);
         }
 
-        public bool RegisterUser(User user, string role)
+        public bool RegisterUser(User user)
         {
-            Role roleData = _db.Roles.Where(x => x.RoleName == role).FirstOrDefault();
-            if ((roleData != null))
+            var userRoleNames = user.Roles.Select(r => r.RoleName.ToLower()).ToList();
+
+            // Get existing roles
+            var existingRoles = _db.Roles
+                .Where(r => userRoleNames.Contains(r.RoleName.ToLower()))
+                .ToList();
+
+            // Find missing roles
+            var missingRoleNames = userRoleNames
+                .Except(existingRoles.Select(r => r.RoleName.ToLower()))
+                .ToList();
+
+            // Add missing roles to the database
+            foreach (var roleName in missingRoleNames)
             {
-                user.Roles.Add(roleData);
+                var newRole = new Role { RoleName = roleName };
+                _db.Roles.Add(newRole);
+                existingRoles.Add(newRole); // Add it to the list to assign to user later
+            }
+
+            if (existingRoles.Any())
+            {
+                user.Roles = existingRoles;
                 _db.Users.Add(user);
                 _db.SaveChanges();
                 return true;
             }
+
             return false;
+           
         }
     }
 }

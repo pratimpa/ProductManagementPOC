@@ -1,4 +1,5 @@
-﻿using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.AspNetCore.Identity;
+using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -20,12 +21,14 @@ namespace WebAPI.Services
             var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
             int ExpireMinutes = Convert.ToInt32(config["Jwt:ExpireMinutes"]);
 
-            var claims = new[] {
+            var claims = new List<Claim>{
                              new Claim(JwtRegisteredClaimNames.Sub, user.Username),
                              new Claim(JwtRegisteredClaimNames.Email, user.Email),
-                             new Claim("Roles", string.Join(",",user.Roles)),
                              new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString())
                              };
+            
+            claims.AddRange(user.Roles.Select(role => new Claim(ClaimTypes.Role, role.RoleName)));
+
 
             var token = new JwtSecurityToken(config["Jwt:Issuer"],
                                             config["Jwt:Audience"],

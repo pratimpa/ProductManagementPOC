@@ -9,6 +9,8 @@ using WebAPI.Services;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using WebAPI.Services.Implementations;
+using WebAPI.Repositories;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -26,8 +28,10 @@ builder.Services.AddDbContext<ProductMgrAuthDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("ProductMgrAuthConnectionString"));
 });
-
+builder.Services.AddTransient<IProductService, ProductService>();
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
 builder.Services.AddTransient<ITokenService, TokenService>();
 builder.Services.AddAutoMapper(typeof(AutoMapperProfiles));
 
@@ -51,7 +55,6 @@ var app = builder.Build();
 
 app.UseHttpsRedirection();
 app.UseAuthentication();
-
 app.UseAuthorization();
 
 app.MapControllers();

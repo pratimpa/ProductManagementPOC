@@ -37,14 +37,14 @@ namespace WebAPI.Controllers
             user.PasswordHash = BC.HashPassword(user.PasswordHash);
             user.IsActive = true;
             user.CreatedAt = DateTime.Now;
-           // if(regUser.UserRoles!=null && regUser.UserRoles.Count>0)
-           // {
-           //     foreach(string r in regUser.UserRoles)
-           //     {
-           //         user.Roles.Add(new Role() { RoleName = r });
-           //     }
-           // }
-            if (_userRepository.RegisterUser(user, "User"))
+            if(regUser.UserRoles!=null && regUser.UserRoles.Count>0)
+            {
+                 foreach(string r in regUser.UserRoles)
+               {
+                    user.Roles.Add(new Role() { RoleName = r });
+               }
+           }
+            if (_userRepository.RegisterUser(user))
             {
                 return Ok("User registered successfully");
             }

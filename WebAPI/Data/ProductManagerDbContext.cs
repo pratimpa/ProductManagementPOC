@@ -6,7 +6,7 @@ namespace WebAPI.Data
 {
     public class ProductManagerDbContext :DbContext
     {
-        public ProductManagerDbContext(DbContextOptions options):base(options)
+        public ProductManagerDbContext(DbContextOptions<ProductManagerDbContext> options):base(options)
         {
             
         }
