@@ -5,17 +5,18 @@ using WebAPI.Models;
 
 namespace WebAPI.Repositories.Implementations
 {
-    public class ProductRepository:IProductRepository
+    public class ProductRepository : IProductRepository
     {
-        ProductManagerDbContext _db; 
+        private readonly ProductManagerDbContext _db;
+
         public ProductRepository(ProductManagerDbContext db)
         {
             _db = db;
         }
 
-        public async void Add(Product entity)
+        public async Task AddAsync(Product entity)
         {
-           await _db.Products.AddAsync(entity);
+            await _db.Products.AddAsync(entity);
         }
 
         public void Delete(int id)
@@ -27,9 +28,9 @@ namespace WebAPI.Repositories.Implementations
             }
         }
 
-        public async Task<Product?> Get(int Id)
+        public async Task<Product?> Get(int id)
         {
-            return await _db.Products.FindAsync(Id);
+            return await _db.Products.FindAsync(id);
         }
 
         public async Task<List<Product>> GetAllAsync()
@@ -44,7 +45,7 @@ namespace WebAPI.Repositories.Implementations
 
         public void Update(Product entity)
         {
-            _db.Update(entity);
+            _db.Products.Update(entity);
         }
     }
 }

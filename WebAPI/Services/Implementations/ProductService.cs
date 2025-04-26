@@ -1,19 +1,20 @@
 ﻿using AutoMapper;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using WebAPI.DTOs;
 using WebAPI.Models;
 using WebAPI.Repositories;
+using WebAPI.Repositories.Implementations;
 using WebAPI.Services.Abstractions;
 
 namespace WebAPI.Services.Implementations
 {
     public class ProductService : IProductService
     {
-        IProductRepository _productRepository;
-        IMapper _mapper;
-        public ProductService(IProductRepository productRepository,IMapper mapper )
+        private readonly IProductRepository _repo;
+
+        public ProductService(IProductRepository repo)
         {
-            this._productRepository = productRepository;
-            this._mapper = mapper;
+            _repo = repo;
         }
         public async Task<Product> AddAsync(ProductDto productDto)
         {
@@ -23,32 +24,60 @@ namespace WebAPI.Services.Implementations
             return entity;
         }
 
-        public void Delete(int id)
+
+
+
+        public async Task<bool> DeleteAsync(int id)
         {
-            throw new NotImplementedException();
+            var product = await _repo.Get(id);
+            if (product == null) return false;
+
+            _repo.Delete(id);
+            await _repo.SaveChangesAsync();
+            return true;
         }
 
         public async Task<List<ProductDto>> GetAllAsync()
         {
-            var entities =await _productRepository.GetAllAsync();
-            var products = _mapper.Map<List<ProductDto>>(entities);
-            return products;
-        }
-
-        public async Task<ProductDto?> GetById(int id)
-        {
-            ProductDto productdto = null;
-            var product = await _productRepository.Get(id);
-            if (product != null)
+            var products = await _repo.GetAllAsync();
+            return products.Select(p => new ProductDto
             {
-                 productdto = _mapper.Map<ProductDto>(product);
-            }
-            return productdto;
+                ProductId = p.ProductId,
+                Name = p.Name,
+                Description = p.Description,
+                Price = p.Price,
+                Stock = p.Stock
+            }).ToList();
         }
 
-        public void Update(ProductDto product)
+        public async Task<ProductDto?> GetByIdAsync(int id)
         {
-            throw new NotImplementedException();
+            var product = await _repo.Get(id);
+            if (product == null) return null;
+
+            return new ProductDto
+            {
+                ProductId = product.ProductId,
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price,
+                Stock = product.Stock
+            };
+        }
+
+        public async Task<bool> UpdateAsync(int id, ProductDto dto)
+        {
+            var product = await _repo.Get(id);
+            if (product == null) return false;
+
+            product.Name = dto.Name;
+            product.Description = dto.Description;
+            product.Price = dto.Price;
+            product.Stock = dto.Stock;
+
+            _repo.Update(product);
+            await _repo.SaveChangesAsync();
+            return true;
         }
     }
 }
