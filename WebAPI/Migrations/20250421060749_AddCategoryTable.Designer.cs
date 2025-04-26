@@ -11,8 +11,8 @@ using WebAPI.Models;
 namespace WebAPI.Migrations
 {
     [DbContext(typeof(ProductManagerDbContext))]
-    [Migration("20250416125823_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250421060749_AddCategoryTable")]
+    partial class AddCategoryTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
