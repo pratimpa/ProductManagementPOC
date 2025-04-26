@@ -1,0 +1,131 @@
+@page "/products"
+@inject Client.Services.IProductService ProductService
+@inject Client.Services.ICategoryService CategoryService
+
+<h3>Products</h3>
+
+@if (products == null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Category</th>
+                <th>Price</th>
+                <th>Stock</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var product in products)
+            {
+                <tr>
+                    <td>@product.Name</td>
+                    <td>@product.Description</td>
+                    <td>@GetCategoryName(product.CategoryId)</td>
+                    <td>@product.Price</td>
+                    <td>@product.Stock</td>
+                    <td>
+                        <button class="btn btn-sm btn-warning me-2" @onclick="() => EditProduct(product)">Edit</button>
+                        <button class="btn btn-sm btn-danger" @onclick="() => DeleteProduct(product.Id)">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@if (editingProduct != null)
+{
+    <h4>Edit Product</h4>
+    <EditForm Model="@editingProduct" OnValidSubmit="HandleEditSubmit">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+
+        <div class="mb-3">
+            <label>Name</label>
+            <InputText class="form-control" @bind-Value="editingProduct.Name" />
+        </div>
+        <div class="mb-3">
+            <label>Description</label>
+            <InputTextArea class="form-control" @bind-Value="editingProduct.Description" />
+        </div>
+        <div class="mb-3">
+            <label>Category</label>
+            <InputSelect class="form-control" @bind-Value="editingProduct.CategoryId">
+                @foreach (var cat in categories)
+                {
+                    <option value="@cat.Id">@cat.Name</option>
+                }
+            </InputSelect>
+        </div>
+        <div class="mb-3">
+            <label>Price</label>
+            <InputNumber class="form-control" @bind-Value="editingProduct.Price" />
+        </div>
+        <div class="mb-3">
+            <label>Stock</label>
+            <InputNumber class="form-control" @bind-Value="editingProduct.Stock" />
+        </div>
+        <button type="submit" class="btn btn-success">Update</button>
+        <button type="button" class="btn btn-secondary ms-2" @onclick="CancelEdit">Cancel</button>
+    </EditForm>
+}
+
+@code {
+    private List<Client.Models.Product> products;
+    private List<Client.Models.Category> categories;
+    private Client.Models.Product editingProduct;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadDataAsync();
+    }
+
+    private async Task LoadDataAsync()
+    {
+        products = (await ProductService.GetProductsAsync()).ToList();
+        categories = (await CategoryService.GetCategoriesAsync()).ToList();
+    }
+
+    private string GetCategoryName(int categoryId)
+    {
+        return categories.FirstOrDefault(c => c.Id == categoryId)?.Name ?? "";
+    }
+
+    private void EditProduct(Client.Models.Product product)
+    {
+        editingProduct = new Client.Models.Product
+        {
+            Id = product.Id,
+            Name = product.Name,
+            Description = product.Description,
+            CategoryId = product.CategoryId,
+            Price = product.Price,
+            Stock = product.Stock
+        };
+    }
+
+    private async Task HandleEditSubmit()
+    {
+        await ProductService.UpdateProductAsync(editingProduct);
+        editingProduct = null;
+        await LoadDataAsync();
+    }
+
+    private void CancelEdit()
+    {
+        editingProduct = null;
+    }
+
+    private async Task DeleteProduct(int id)
+    {
+        await ProductService.DeleteProductAsync(id);
+        await LoadDataAsync();
+    }
+}
