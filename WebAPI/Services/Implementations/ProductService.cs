@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using WebAPI.DTOs;
 using WebAPI.Models;
@@ -16,12 +17,24 @@ namespace WebAPI.Services.Implementations
         {
             _repo = repo;
         }
-        public async Task<Product> AddAsync(ProductDto productDto)
+
+        public async Task<ProductDto> AddAsync(ProductDto dto)
         {
-            var entity = _mapper.Map<Product>(productDto);
-              _productRepository.Add(entity);
-            await  _productRepository.SaveChangesAsync();
-            return entity;
+            var entity = new Product
+            {
+                Name = dto.Name,
+                Description = dto.Description,
+                Price = dto.Price,
+                Stock = dto.Stock,
+                CategoryId = dto.CategoryId
+
+            };
+
+            await _repo.AddAsync(entity);
+            await _repo.SaveChangesAsync();
+
+            dto.ProductId = entity.ProductId;
+            return dto;
         }
 
 
@@ -37,9 +50,18 @@ namespace WebAPI.Services.Implementations
             return true;
         }
 
-        public async Task<List<ProductDto>> GetAllAsync()
+        public async Task<List<ProductDto>> GetAllAsync(int pagenumber, int pagesize)
         {
             var products = await _repo.GetAllAsync();
+
+
+            int skip = (pagenumber - 1) * pagesize;
+
+            var pagedData =  products
+                            .OrderBy(x => x.ProductId) // important: always ORDER BY something
+                            .Skip(skip)
+                            .Take(pagesize)
+                            .ToList();
             return products.Select(p => new ProductDto
             {
                 ProductId = p.ProductId,

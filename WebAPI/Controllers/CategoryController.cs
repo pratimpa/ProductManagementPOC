@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using Microsoft.AspNetCore.Authorization;
+﻿using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using WebAPI.DTOs;
 using WebAPI.Services.Abstractions;
@@ -8,30 +7,30 @@ namespace WebAPI.Controllers
 {
     [Route("api/[controller]/[action]")]
     [ApiController]
-    public class ProductController : ControllerBase
+    public class CategoryController : Controller
     {
-        private readonly IProductService _productService;
+        private readonly ICategoryService _categoryService;
 
-        public ProductController(IProductService productService)
+        public CategoryController(ICategoryService categoryService)
         {
-            _productService = productService;
+            _categoryService = categoryService;
         }
 
         [HttpPost]
-        //[Authorize(Roles = "Admin")]
+    //    [Authorize(Roles = "Admin")]
 
-        public async Task<IActionResult> Create([FromBody] ProductDto productDto)
+        public async Task<IActionResult> Create([FromBody] CategoryDto categoryDto)
         {
-            var product = await _productService.AddAsync(productDto);
-            return CreatedAtAction(nameof(GetById), new { id = product.ProductId }, product);
+            var category = await _categoryService.AddAsync(categoryDto);
+            return CreatedAtAction(nameof(GetById), new { id = category.CategoryId }, category);
         }
 
         [HttpGet("{id:int}")]
         public async Task<IActionResult> GetById(int id)
         {
-            var productDto = await _productService.GetByIdAsync(id);
-            if (productDto == null) return NotFound();
-            return Ok(productDto);
+            var categoryDto = await _categoryService.GetByIdAsync(id);
+            if (categoryDto == null) return NotFound();
+            return Ok(categoryDto);
         }
 
         [HttpGet]
@@ -42,32 +41,31 @@ namespace WebAPI.Controllers
                 string SortDirection = "asc")
         {
 
-            var products = await _productService.GetAllAsync(PageNumber,PageSize);
+            var products = await _categoryService.GetAllAsync();
             return Ok(products);
         }
 
         [HttpPut("{id:int}")]
         //[Authorize(Roles = "Admin")]
-        public async Task<IActionResult> Update(int id, [FromBody] ProductDto productDto)
+        public async Task<IActionResult> Update(int id, [FromBody] CategoryDto categoryDto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
-            var updated = await _productService.UpdateAsync(id, productDto);
+            var updated = await _categoryService.UpdateAsync(id, categoryDto);
             if (!updated) return NotFound();
 
             return Ok(updated);
         }
 
         [HttpDelete("{id:int}")]
-        //[Authorize(Roles = "Admin")]
+       // [Authorize(Roles = "Admin")]
         public async Task<IActionResult> Delete(int id)
         {
-            var deleted = await _productService.DeleteAsync(id);
+            var deleted = await _categoryService.DeleteAsync(id);
             if (!deleted) return NotFound();
             return Ok(deleted);
         }
     }
-
 }

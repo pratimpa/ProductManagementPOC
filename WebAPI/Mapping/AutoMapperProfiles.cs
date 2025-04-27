@@ -10,6 +10,7 @@ namespace WebAPI.Mapping
         {
             CreateMap<RegisterUserDto, User>().ReverseMap();
             CreateMap<ProductDto, Product>().ReverseMap();
+            CreateMap<CategoryDto, Category>().ReverseMap();
         }
     }
 }

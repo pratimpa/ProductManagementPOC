@@ -1,0 +1,46 @@
+﻿@page "/"
+
+<div class="container mt-5">
+    <h2 class="mb-4">Welcome to the E-Commerce Product Management System</h2>
+
+    <p class="text-muted">
+        Manage your product catalog, categories, and inventory efficiently.
+        Designed for administrators to create, update, and monitor products with ease.
+    </p>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100" style="cursor:pointer;" @onclick="GoToProducts">
+                <div class="card-body text-center">
+                    <h4 class="card-title">🛒 Manage Products</h4>
+                    <p class="card-text">Create, edit, and organize your products easily.</p>
+                    <button class="btn btn-primary">Go to Products</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card shadow-sm h-100" style="cursor:pointer;" @onclick="GoToCategories">
+                <div class="card-body text-center">
+                    <h4 class="card-title">📂 Manage Categories</h4>
+                    <p class="card-text">Group products under categories to organize your store better.</p>
+                    <button class="btn btn-primary">Go to Categories</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@code {
+    [Inject] private NavigationManager Navigation { get; set; } = default!;
+
+    void GoToProducts()
+    {
+        Navigation.NavigateTo("/products");
+    }
+
+    void GoToCategories()
+    {
+        Navigation.NavigateTo("/categories");
+    }
+}
